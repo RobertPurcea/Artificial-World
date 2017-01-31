@@ -1,3 +1,5 @@
+import print from './print.js';
+
 export default class Grid {
 
 	//build an empty array with length = width * height
@@ -38,10 +40,10 @@ export default class Grid {
 		var helper;
 		switch (type) {
 			case "o":
-				helper = 2;
+				helper = 5;
 				break;
 			case "x":
-				helper = 4;
+				helper = 10;
 				break;
 			default:
 				alert("FUNCTION RANDOM");
@@ -56,5 +58,9 @@ export default class Grid {
 
 		this.replaceEmptySpaceWithElement(herbivoreNumber, "o")
 		this.replaceEmptySpaceWithElement(carnivoreNumber, "x")
+	}
+
+	output() {
+		print(this);
 	}
 }

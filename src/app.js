@@ -13,19 +13,18 @@ grid.array = grid.array.map((current, index) => {
 	return new gridElement(current, index, grid);
 });
 
-// Grid.prototype.turn = function() {
-// 	setTimeout(function() {
-// 		grid.array.forEach(function(elem) {
-// 			elem.move();
-// 			print(grid);
-// 		});
-// 	}, 1000);
-// };
-print(grid);
+// 
+Grid.prototype.turn = function() {
+	this.array.forEach(elem => {
+		if (!elem.alreadyMoved) {
+			elem.move();
+		}
+		print(this);
+	})
+	this.array.forEach(elem => {
+		elem.alreadyMoved = false;
+	})
+};
 
-setTimeout(function() {
-	grid.array.forEach(function(elem) {
-		elem.move();
-		print(grid);
-	});
-}, 1000);
+grid.output();
+//setInterval(() => {grid.turn()}, 1000);

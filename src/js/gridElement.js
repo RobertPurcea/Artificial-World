@@ -6,7 +6,7 @@ export default class gridElement {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
-		//this.alreadyMoved = false;
+		this.alreadyMoved = false;
 	}
 
 	// returns an array that contains information about each square immediately around this one
@@ -17,7 +17,7 @@ export default class gridElement {
 		// retrieve information from a square and push it to elementsAround
 		function lookInOneSide(x, y) {
 			//	make sure the current (x,y) coordinates are not out of grid
-			if (x >= 0 && y >= 0 && x <= 9 && y <= 9) {
+			if (x >= 0 && y >= 0 && x < this.grid.width && y < this.grid.height) {
 				// transform x,y position in grid array index
 				const index = x + this.grid.width * y;
 				elementsAround.push({
@@ -38,6 +38,7 @@ export default class gridElement {
 		lookInOneSide(this.x - 1, this.y);
 		lookInOneSide(this.x - 1, this.y + 1);
 
+		//console.log(elementsAround);
 		return elementsAround;
 	}
 
@@ -52,11 +53,10 @@ export default class gridElement {
 		const randomSquare = emptyElementsAround[Math.floor(Math.random() * emptyElementsAround.length)];
 
 		// replace the targeted empty space with this object
-		this.grid.array[randomSquare.index] = this;
-		//this.type = " ";
-		//this.grid.array[randomSquare.index] = this;
-
+		this.grid.array[randomSquare.index].type = this.type;
+		this.grid.array[randomSquare.index].alreadyMoved = true;
+				
 		//empty the old space
-		//this.type = "o";
+		this.type = " ";
 	}
 }

@@ -79,6 +79,12 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
+var _print = __webpack_require__(2);
+
+var _print2 = _interopRequireDefault(_print);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var Grid = function () {
@@ -133,10 +139,10 @@ var Grid = function () {
 			var helper;
 			switch (type) {
 				case "o":
-					helper = 2;
+					helper = 5;
 					break;
 				case "x":
-					helper = 4;
+					helper = 10;
 					break;
 				default:
 					alert("FUNCTION RANDOM");
@@ -154,6 +160,11 @@ var Grid = function () {
 
 			this.replaceEmptySpaceWithElement(herbivoreNumber, "o");
 			this.replaceEmptySpaceWithElement(carnivoreNumber, "x");
+		}
+	}, {
+		key: "output",
+		value: function output() {
+			(0, _print2.default)(this);
 		}
 	}]);
 
@@ -187,7 +198,7 @@ var gridElement = function () {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
-		//this.alreadyMoved = false;
+		this.alreadyMoved = false;
 	}
 
 	// returns an array that contains information about each square immediately around this one
@@ -202,7 +213,7 @@ var gridElement = function () {
 			// retrieve information from a square and push it to elementsAround
 			function lookInOneSide(x, y) {
 				//	make sure the current (x,y) coordinates are not out of grid
-				if (x >= 0 && y >= 0 && x <= 9 && y <= 9) {
+				if (x >= 0 && y >= 0 && x < this.grid.width && y < this.grid.height) {
 					// transform x,y position in grid array index
 					var index = x + this.grid.width * y;
 					elementsAround.push({
@@ -223,6 +234,7 @@ var gridElement = function () {
 			lookInOneSide(this.x - 1, this.y);
 			lookInOneSide(this.x - 1, this.y + 1);
 
+			//console.log(elementsAround);
 			return elementsAround;
 		}
 	}, {
@@ -240,12 +252,11 @@ var gridElement = function () {
 			var randomSquare = emptyElementsAround[Math.floor(Math.random() * emptyElementsAround.length)];
 
 			// replace the targeted empty space with this object
-			this.grid.array[randomSquare.index] = this;
-			//this.type = " ";
-			//this.grid.array[randomSquare.index] = this;
+			this.grid.array[randomSquare.index].type = this.type;
+			this.grid.array[randomSquare.index].alreadyMoved = true;
 
 			//empty the old space
-			//this.type = "o";
+			this.type = " ";
 		}
 	}]);
 
@@ -339,7 +350,7 @@ exports = module.exports = __webpack_require__(6)();
 
 
 // module
-exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nsection {\n  width: 300px;\n  height: 300px;\n  border: 1px solid brown;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start; }\n\ndiv {\n  flex: auto 0 0;\n  border: 1px solid black; }\n\n.herbivore {\n  background-color: green; }\n\n.carnivore {\n  background-color: red; }\n\n.empty {\n  background-color: grey; }\n", ""]);
+exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nsection {\n  width: 400px;\n  height: 400px;\n  border: 1px solid brown;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start;\n  margin: auto; }\n\ndiv {\n  flex: auto 0 0;\n  border: 1px solid black; }\n\n.herbivore {\n  background-color: green; }\n\n.carnivore {\n  background-color: red; }\n\n.empty {\n  background-color: grey; }\n", ""]);
 
 // exports
 
@@ -689,22 +700,23 @@ grid.array = grid.array.map(function (current, index) {
 	return new _gridElement2.default(current, index, grid);
 });
 
-// Grid.prototype.turn = function() {
-// 	setTimeout(function() {
-// 		grid.array.forEach(function(elem) {
-// 			elem.move();
-// 			print(grid);
-// 		});
-// 	}, 1000);
-// };
-(0, _print2.default)(grid);
+// 
+_grid2.default.prototype.turn = function () {
+	var _this = this;
 
-setTimeout(function () {
-	grid.array.forEach(function (elem) {
-		elem.move();
-		(0, _print2.default)(grid);
+	this.array.forEach(function (elem) {
+		if (!elem.alreadyMoved) {
+			elem.move();
+		}
+		(0, _print2.default)(_this);
 	});
-}, 1000);
+	this.array.forEach(function (elem) {
+		elem.alreadyMoved = false;
+	});
+};
+
+grid.output();
+//setInterval(() => {grid.turn()}, 1000);
 
 /***/ })
 /******/ ]);
