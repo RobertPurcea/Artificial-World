@@ -6,12 +6,11 @@ export default class gridElement {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
-		this.alreadyMoved = false;
 	}
 
 	// returns an array that contains information about each square immediately around this one
 	look() {
-		// store all information
+		// store here all the information about the elements around
 		let elementsAround = [];
 
 		// retrieve information from a square and push it to elementsAround
@@ -38,24 +37,36 @@ export default class gridElement {
 		lookInOneSide(this.x - 1, this.y);
 		lookInOneSide(this.x - 1, this.y + 1);
 
-		//console.log(elementsAround);
 		return elementsAround;
 	}
 
-	move() {
-		// filter the array for only empty spaces. Return if no spaces are found
-		let emptyElementsAround = this.look().filter(curr => curr.type === " " ? true : false);
-		if (emptyElementsAround.length === 0 || this.type === " ") {
+	// moves the animated elements(not grass, stones, or empty space)
+	act(action) {
+		// choose the type of square we are looking for(ex: if it's a carnivore's turn, it will look for herbivore type squares)
+		var preference;
+		switch(action) {
+			case "move":
+				preference = " ";
+				break;
+			case "eatGrass":
+				preference = "|";
+				break;
+			case "eatMeat":
+				preference = "o";
+		}
+
+		//	filter the this.look() array to only the squares that match the current preference
+		let elementsAroundPreference = this.look().filter(curr => curr.type === preference);
+		if (elementsAroundPreference.length === 0) {
 			return;
 		}
 				
-		//	random an empty space
-		const randomSquare = emptyElementsAround[Math.floor(Math.random() * emptyElementsAround.length)];
+		//	random a square around
+		const randomSquarePreference = elementsAroundPreference[Math.floor(Math.random() * elementsAroundPreference.length)];
 
-		// replace the targeted empty space with this object
-		this.grid.array[randomSquare.index].type = this.type;
-		this.grid.array[randomSquare.index].alreadyMoved = true;
-				
+		// replace the targeted square with this object
+		this.grid.array[randomSquarePreference.index].type = this.type;
+						
 		//empty the old space
 		this.type = " ";
 	}

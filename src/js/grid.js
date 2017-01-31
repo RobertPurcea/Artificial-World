@@ -2,7 +2,7 @@ import print from './print.js';
 
 export default class Grid {
 
-	//build an empty array with length = width * height
+	//build an array of width * height elements. Assign " " to every element
 	constructor(width, height) {
 		this.width = width;
 		this.height = height;
@@ -11,23 +11,39 @@ export default class Grid {
 		this.array = this.array.map(current => " ");
 	}
 
-	//	returns the index of a random empty space from this.array. If none is available, return false
+	//	return the index of an empty random element from grid.array
 	randomEmptySpace() {
-		// return false if no empty space is available
-		if (this.array.indexOf(" ") === -1 ? true : false) {
-			return false;
+		var index = Math.floor(Math.random() * this.array.length);
+		
+		while (this.array[index] !== " ") {
+			index = Math.floor(Math.random() * this.array.length);
 		}
-
-		let index = Math.floor(Math.random() * this.array.length);
-
-		//	if the space was not empty run the function again else return
-		if (this.array[index] === " ") {
-			return index;
-		} else {
-			this.randomEmptySpace();
-		}
+		return index;
 	}
 
+	//	random how many elements of each type there will be on the grid(some elements have a higher chance of being more numerous than others)
+	random(type) {
+		var divideArrayLength;
+		switch (type) {
+			case "o":
+				divideArrayLength = 15;
+				break;
+			case "x":
+				divideArrayLength = 25;
+				break;
+			case "@":
+				divideArrayLength = 7;
+				break;
+			case "|":
+				divideArrayLength = 4;
+				break;
+			default:
+				alert("FUNCTION RANDOM");
+		}
+		return Math.floor(Math.random() * this.array.length / divideArrayLength + 1);
+	}
+
+	//	place elements on randomly picked empty spaces
 	replaceEmptySpaceWithElement(number, type) {
 		while (number > 0) {
 			this.array[this.randomEmptySpace()] = type;
@@ -35,31 +51,20 @@ export default class Grid {
 		}
 	}
 
-	//	get a random number of elements based on their type(ex: herbivores are twice as many as carnivores)
-	random(type) {
-		var helper;
-		switch (type) {
-			case "o":
-				helper = 5;
-				break;
-			case "x":
-				helper = 10;
-				break;
-			default:
-				alert("FUNCTION RANDOM");
-		}
-		return Math.floor(Math.random() * this.array.length / helper + 1);
-	}
-
 	// populate the grid with random elements
 	populate() {
 		let herbivoreNumber = this.random("o");
 		let carnivoreNumber = this.random("x");
+		let stoneNumber = this.random("@");
+		let grassNumber = this.random("|");
 
-		this.replaceEmptySpaceWithElement(herbivoreNumber, "o")
-		this.replaceEmptySpaceWithElement(carnivoreNumber, "x")
+		this.replaceEmptySpaceWithElement(herbivoreNumber, "o");
+		this.replaceEmptySpaceWithElement(carnivoreNumber, "x");
+		this.replaceEmptySpaceWithElement(stoneNumber, "@");
+		this.replaceEmptySpaceWithElement(grassNumber, "|");
 	}
 
+	// print the current state of the grid
 	output() {
 		print(this);
 	}

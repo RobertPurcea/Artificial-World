@@ -89,7 +89,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Grid = function () {
 
-	//build an empty array with length = width * height
+	//build an array of width * height elements. Assign " " to every element
 	function Grid(width, height) {
 		_classCallCheck(this, Grid);
 
@@ -102,26 +102,47 @@ var Grid = function () {
 		});
 	}
 
-	//	returns the index of a random empty space from this.array. If none is available, return false
+	//	return the index of an empty random element from grid.array
 
 
 	_createClass(Grid, [{
 		key: "randomEmptySpace",
 		value: function randomEmptySpace() {
-			// return false if no empty space is available
-			if (this.array.indexOf(" ") === -1 ? true : false) {
-				return false;
-			}
-
 			var index = Math.floor(Math.random() * this.array.length);
 
-			//	if the space was not empty run the function again else return
-			if (this.array[index] === " ") {
-				return index;
-			} else {
-				this.randomEmptySpace();
+			while (this.array[index] !== " ") {
+				index = Math.floor(Math.random() * this.array.length);
 			}
+			return index;
 		}
+
+		//	random how many elements of each type there will be on the grid(some elements have a higher chance of being more numerous than others)
+
+	}, {
+		key: "random",
+		value: function random(type) {
+			var divideArrayLength;
+			switch (type) {
+				case "o":
+					divideArrayLength = 15;
+					break;
+				case "x":
+					divideArrayLength = 25;
+					break;
+				case "@":
+					divideArrayLength = 7;
+					break;
+				case "|":
+					divideArrayLength = 4;
+					break;
+				default:
+					alert("FUNCTION RANDOM");
+			}
+			return Math.floor(Math.random() * this.array.length / divideArrayLength + 1);
+		}
+
+		//	place elements on randomly picked empty spaces
+
 	}, {
 		key: "replaceEmptySpaceWithElement",
 		value: function replaceEmptySpaceWithElement(number, type) {
@@ -131,25 +152,6 @@ var Grid = function () {
 			}
 		}
 
-		//	get a random number of elements based on their type(ex: herbivores are twice as many as carnivores)
-
-	}, {
-		key: "random",
-		value: function random(type) {
-			var helper;
-			switch (type) {
-				case "o":
-					helper = 5;
-					break;
-				case "x":
-					helper = 10;
-					break;
-				default:
-					alert("FUNCTION RANDOM");
-			}
-			return Math.floor(Math.random() * this.array.length / helper + 1);
-		}
-
 		// populate the grid with random elements
 
 	}, {
@@ -157,10 +159,17 @@ var Grid = function () {
 		value: function populate() {
 			var herbivoreNumber = this.random("o");
 			var carnivoreNumber = this.random("x");
+			var stoneNumber = this.random("@");
+			var grassNumber = this.random("|");
 
 			this.replaceEmptySpaceWithElement(herbivoreNumber, "o");
 			this.replaceEmptySpaceWithElement(carnivoreNumber, "x");
+			this.replaceEmptySpaceWithElement(stoneNumber, "@");
+			this.replaceEmptySpaceWithElement(grassNumber, "|");
 		}
+
+		// print the current state of the grid
+
 	}, {
 		key: "output",
 		value: function output() {
@@ -198,7 +207,6 @@ var gridElement = function () {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
-		this.alreadyMoved = false;
 	}
 
 	// returns an array that contains information about each square immediately around this one
@@ -207,7 +215,7 @@ var gridElement = function () {
 	_createClass(gridElement, [{
 		key: "look",
 		value: function look() {
-			// store all information
+			// store here all the information about the elements around
 			var elementsAround = [];
 
 			// retrieve information from a square and push it to elementsAround
@@ -234,26 +242,40 @@ var gridElement = function () {
 			lookInOneSide(this.x - 1, this.y);
 			lookInOneSide(this.x - 1, this.y + 1);
 
-			//console.log(elementsAround);
 			return elementsAround;
 		}
+
+		// moves the animated elements(not grass, stones, or empty space)
+
 	}, {
-		key: "move",
-		value: function move() {
-			// filter the array for only empty spaces. Return if no spaces are found
-			var emptyElementsAround = this.look().filter(function (curr) {
-				return curr.type === " " ? true : false;
+		key: "act",
+		value: function act(action) {
+			// choose the type of square we are looking for(ex: if it's a carnivore's turn, it will look for herbivore type squares)
+			var preference;
+			switch (action) {
+				case "move":
+					preference = " ";
+					break;
+				case "eatGrass":
+					preference = "|";
+					break;
+				case "eatMeat":
+					preference = "o";
+			}
+
+			//	filter the this.look() array to only the squares that match the current preference
+			var elementsAroundPreference = this.look().filter(function (curr) {
+				return curr.type === preference;
 			});
-			if (emptyElementsAround.length === 0 || this.type === " ") {
+			if (elementsAroundPreference.length === 0) {
 				return;
 			}
 
-			//	random an empty space
-			var randomSquare = emptyElementsAround[Math.floor(Math.random() * emptyElementsAround.length)];
+			//	random a square around
+			var randomSquarePreference = elementsAroundPreference[Math.floor(Math.random() * elementsAroundPreference.length)];
 
-			// replace the targeted empty space with this object
-			this.grid.array[randomSquare.index].type = this.type;
-			this.grid.array[randomSquare.index].alreadyMoved = true;
+			// replace the targeted square with this object
+			this.grid.array[randomSquarePreference.index].type = this.type;
 
 			//empty the old space
 			this.type = " ";
@@ -278,12 +300,12 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = print;
 function print(grid) {
 
-	// Calculate the size necessary for every element, so that all of them are as wide as the container they are in
+	// Calculate the size necessary for every grid element, so that the cumulative size of all of them is exactly as wide as the container they are in
 	var container = document.querySelector('#gameWrapper');
 	var elementWidth = container.clientWidth / grid.width;
 	var elementHeight = container.clientHeight / grid.height;
 
-	// If this it's the first time running this(#container is an empty element), create the divs in which each element is located, and attach them to the #container section
+	// If the #container is empty(this is the first time running print()), create the divs in which each grid element is located, and attach them to the #container section
 	if (!container.getElementsByTagName('div').length) {
 		grid.array.forEach(function (current) {
 			var div = document.createElement('div');
@@ -293,7 +315,7 @@ function print(grid) {
 		});
 	}
 
-	//	If the divs are already created and attached to the DOM, iterate over them and apply the classes necessary for each type(herbivore => green, carnivore => red)
+	//	If the divs are already created, iterate over them and apply the style classes necessary(herbivore => green, carnivore => red)
 	var divs = Array.from(container.getElementsByTagName('div'));
 	divs.forEach(function (element, index) {
 		switch (grid.array[index].type) {
@@ -302,6 +324,12 @@ function print(grid) {
 				break;
 			case "x":
 				element.className = "carnivore";
+				break;
+			case "@":
+				element.className = "stone";
+				break;
+			case "|":
+				element.className = "grass";
 				break;
 			default:
 				element.className = "empty";
@@ -350,7 +378,7 @@ exports = module.exports = __webpack_require__(6)();
 
 
 // module
-exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nsection {\n  width: 400px;\n  height: 400px;\n  border: 1px solid brown;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start;\n  margin: auto; }\n\ndiv {\n  flex: auto 0 0;\n  border: 1px solid black; }\n\n.herbivore {\n  background-color: green; }\n\n.carnivore {\n  background-color: red; }\n\n.empty {\n  background-color: grey; }\n", ""]);
+exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nsection {\n  width: 300px;\n  height: 300px;\n  border: 1px solid brown;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start;\n  margin: auto; }\n\ndiv {\n  flex: auto 0 0;\n  border: 1px solid black; }\n\n.herbivore {\n  background-color: darkgreen; }\n\n.carnivore {\n  background-color: red; }\n\n.stone {\n  background-color: #222; }\n\n.grass {\n  background-color: lightgreen; }\n\n.empty {\n  background-color: grey; }\n", ""]);
 
 // exports
 
@@ -691,7 +719,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 __webpack_require__(3);
 
 
-//	Initialize the grid
+//	Initialize the grid and populate it
 var grid = new _grid2.default(10, 10);
 grid.populate();
 
@@ -700,23 +728,37 @@ grid.array = grid.array.map(function (current, index) {
 	return new _gridElement2.default(current, index, grid);
 });
 
-// 
-_grid2.default.prototype.turn = function () {
-	var _this = this;
-
-	this.array.forEach(function (elem) {
-		if (!elem.alreadyMoved) {
-			elem.move();
-		}
-		(0, _print2.default)(_this);
-	});
-	this.array.forEach(function (elem) {
-		elem.alreadyMoved = false;
-	});
-};
-
+//first stage output
 grid.output();
-//setInterval(() => {grid.turn()}, 1000);
+
+// Run world
+setInterval(function () {
+
+	grid.array.filter(function (current) {
+		return current.type === "o" || current.type === "x";
+	}).forEach(function (current1) {
+		current1.act("move");
+	});
+	grid.output();
+
+	setTimeout(function () {
+		grid.array.filter(function (current) {
+			return current.type === "x";
+		}).forEach(function (current1) {
+			current1.act("eatMeat");
+		});
+		grid.output();
+	}, 800);
+
+	setTimeout(function () {
+		grid.array.filter(function (current) {
+			return current.type === "o";
+		}).forEach(function (current1) {
+			current1.act("eatGrass");
+		}), 800;
+	});
+	grid.output();
+}, 2000);
 
 /***/ })
 /******/ ]);
