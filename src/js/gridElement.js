@@ -6,6 +6,7 @@ export default class gridElement {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
+		this.reproduceCounter = 0;
 	}
 
 	// returns an array that contains information about each square immediately around this one
@@ -53,6 +54,10 @@ export default class gridElement {
 				break;
 			case "eatMeat":
 				preference = "o";
+				break;
+			case "reproduce":
+				preference = " ";
+				break;
 		}
 
 		//	filter the this.look() array to only the squares that match the current preference
@@ -67,7 +72,9 @@ export default class gridElement {
 		// replace the targeted square with this object
 		this.grid.array[randomSquarePreference.index].type = this.type;
 						
-		//empty the old space
-		this.type = " ";
+		//empty the old space if not in reproduce case
+		if(action !== "reproduce") {
+			this.type = " ";
+		}
 	}
 }

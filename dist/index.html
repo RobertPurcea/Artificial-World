@@ -1,15 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<meta charset="utf-8">
-	<title>World</title>
 
-	<script src="bundle.js" defer></script>
+<head>
+   <meta charset="utf-8">
+   <title>World</title>
+   <link rel="stylesheet" type="text/css"
+      href="https://fonts.googleapis.com/css?family=Rancho&effect=ice">
+   <script src="bundle.js" defer></script>
 </head>
+
 <body>
-	<section id="gameWrapper">
-<!-- 		<div></div>
-		<div></div> -->
-	</section>
+   <div id="wrapper">
+   	<!-- Start game + Instructions -->
+   	<section id="startGamePanel">
+   		<h1 class="font-effect-ice">ARTIFICIAL WORLD</h1>
+   		<button>Start game</button>
+   		<button>Instructions</button>
+
+   		<div id="instructions">
+   			<h1 class="font-effect-ice">INSTRUCTIONS</h1>
+   			<button>Go back!</button>
+   			<p>Try to keep the environment stable for as long as you can. You can click anywhere on the map to remove an element. You can also drag and drop the elements from the left to introduce additional elemens into the map. Be creative!</p>
+   			<ol>
+   				<li><img src="http://www.clker.com/cliparts/Y/W/s/K/X/C/red-robot-md.png" alt=""> <span>- Capable of eating the green robots. Does not increase in number over time</span></li>
+   				<li><img src="https://s24.postimg.org/zf6feccvp/prey.png" alt=""><span> - Eats only grass. Each 10 seconds they DOUBLE in number, so be careful how many of these you will keep!</span></li>
+   				<li><img src="https://s30.postimg.org/e9sil8ss1/stone1.png" alt=""><span> - The stones are immpasable terrain, no robots can pass over it, they act like a fence if you use them right!</span></li>
+   				<li><img src="https://s24.postimg.org/axcfxhexx/grass1.png" alt=""><span> - Food for the green robots. The red robots can't pass over it</span></li>
+   			</ol>
+   		</div>  	
+   	</section>
+
+   	<!-- Tools panel -->
+      <section id="tools">
+         <div>
+         	<img id="herbivore" src="https://s24.postimg.org/zf6feccvp/prey.png" alt="" draggable="true">
+         </div>
+         <div>
+         	<img id="carnivore" src="http://www.clker.com/cliparts/Y/W/s/K/X/C/red-robot-md.png" alt="" draggable="true">
+         </div>
+         <div>
+         	<img id="stone" src="https://s30.postimg.org/e9sil8ss1/stone1.png" alt="" draggable="true">
+         </div>
+         <div>
+         	<img id="grass" src="https://s24.postimg.org/axcfxhexx/grass1.png" alt="" draggable="true">
+         </div>
+      </section>
+
+      <!-- All the grid elements will be inserted here by JS code -->
+      <section id="gameMap">
+      </section>
+   </div>
 </body>
+
 </html>

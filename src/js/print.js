@@ -1,16 +1,17 @@
 export default function print(grid) {
 
 	// Calculate the size necessary for every grid element, so that the cumulative size of all of them is exactly as wide as the container they are in
-	const container = document.querySelector('#gameWrapper');
+	const container = document.querySelector('#gameMap');
 	const elementWidth = container.clientWidth / grid.width;
 	const elementHeight = container.clientHeight / grid.height;
 
 	// If the #container is empty(this is the first time running print()), create the divs in which each grid element is located, and attach them to the #container section
 	if (!container.getElementsByTagName('div').length) {
-		grid.array.forEach(current => {
+		grid.array.forEach((current, index) => {
 			let div = document.createElement('div');
 			div.style.width = elementWidth + "px";
 			div.style.height = elementHeight + "px";
+			div.index = index;
 			container.append(div);
 		})
 	}

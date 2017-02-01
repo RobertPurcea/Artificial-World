@@ -1,33 +1,23 @@
+@import './tools.sass'
+@import './gameMap.sass'
+@import './startGamePanel.sass'
 *
 	margin: 0
 	padding: 0
 	box-sizing: border-box
 
-section
-	width: 300px
-	height: 300px
-	border: 1px solid brown
-
+body
+	width: 100vw
+	height: 100vh
+	background-color: #42c2f4
+#wrapper 
+	width: 700px
 	display: flex
-	flex-flow: row wrap
-	align-content: flex-start
 	margin: auto
-	   
-div
-	flex: auto 0 0
-	border: 1px solid black
+	//border: 1px solid blue
+	position: relative
+	top: 30px
+	background-image: url("http://read.pudn.com/downloads106/sourcecode/others/435495/SuperTractor/res/BackGround__.jpg")
 	
-.herbivore
-	background-color: darkgreen
 
-.carnivore
-	background-color: red
 
-.stone
-	background-color: #222
-
-.grass
-	background-color: lightgreen
-
-.empty
-	background-color: grey

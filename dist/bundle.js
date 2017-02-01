@@ -207,6 +207,7 @@ var gridElement = function () {
 		this.x = index % grid.width;
 		this.y = parseInt(index / grid.width);
 		this.grid = grid;
+		this.reproduceCounter = 0;
 	}
 
 	// returns an array that contains information about each square immediately around this one
@@ -261,6 +262,10 @@ var gridElement = function () {
 					break;
 				case "eatMeat":
 					preference = "o";
+					break;
+				case "reproduce":
+					preference = " ";
+					break;
 			}
 
 			//	filter the this.look() array to only the squares that match the current preference
@@ -277,8 +282,10 @@ var gridElement = function () {
 			// replace the targeted square with this object
 			this.grid.array[randomSquarePreference.index].type = this.type;
 
-			//empty the old space
-			this.type = " ";
+			//empty the old space if not in reproduce case
+			if (action !== "reproduce") {
+				this.type = " ";
+			}
 		}
 	}]);
 
@@ -301,16 +308,17 @@ exports.default = print;
 function print(grid) {
 
 	// Calculate the size necessary for every grid element, so that the cumulative size of all of them is exactly as wide as the container they are in
-	var container = document.querySelector('#gameWrapper');
+	var container = document.querySelector('#gameMap');
 	var elementWidth = container.clientWidth / grid.width;
 	var elementHeight = container.clientHeight / grid.height;
 
 	// If the #container is empty(this is the first time running print()), create the divs in which each grid element is located, and attach them to the #container section
 	if (!container.getElementsByTagName('div').length) {
-		grid.array.forEach(function (current) {
+		grid.array.forEach(function (current, index) {
 			var div = document.createElement('div');
 			div.style.width = elementWidth + "px";
 			div.style.height = elementHeight + "px";
+			div.index = index;
 			container.append(div);
 		});
 	}
@@ -341,7 +349,7 @@ function print(grid) {
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = "<!DOCTYPE html>\r\n<html>\r\n<head>\r\n\t<meta charset=\"utf-8\">\r\n\t<title>World</title>\r\n\r\n\t<script src=\"bundle.js\" defer></script>\r\n</head>\r\n<body>\r\n\t<section id=\"gameWrapper\">\r\n<!-- \t\t<div></div>\r\n\t\t<div></div> -->\r\n\t</section>\r\n</body>\r\n</html>"
+module.exports = "<!DOCTYPE html>\r\n<html>\r\n\r\n<head>\r\n   <meta charset=\"utf-8\">\r\n   <title>World</title>\r\n   <link rel=\"stylesheet\" type=\"text/css\"\r\n      href=\"https://fonts.googleapis.com/css?family=Rancho&effect=ice\">\r\n   <script src=\"bundle.js\" defer></script>\r\n</head>\r\n\r\n<body>\r\n   <div id=\"wrapper\">\r\n   \t<!-- Start game + Instructions -->\r\n   \t<section id=\"startGamePanel\">\r\n   \t\t<h1 class=\"font-effect-ice\">ARTIFICIAL WORLD</h1>\r\n   \t\t<button>Start game</button>\r\n   \t\t<button>Instructions</button>\r\n\r\n   \t\t<div id=\"instructions\">\r\n   \t\t\t<h1 class=\"font-effect-ice\">INSTRUCTIONS</h1>\r\n   \t\t\t<button>Go back!</button>\r\n   \t\t\t<p>Try to keep the environment stable for as long as you can. You can click anywhere on the map to remove an element. You can also drag and drop the elements from the left to introduce additional elemens into the map. Be creative!</p>\r\n   \t\t\t<ol>\r\n   \t\t\t\t<li><img src=\"http://www.clker.com/cliparts/Y/W/s/K/X/C/red-robot-md.png\" alt=\"\"> <span>- Capable of eating the green robots. Does not increase in number over time</span></li>\r\n   \t\t\t\t<li><img src=\"https://s24.postimg.org/zf6feccvp/prey.png\" alt=\"\"><span> - Eats only grass. Each 10 seconds they DOUBLE in number, so be careful how many of these you will keep!</span></li>\r\n   \t\t\t\t<li><img src=\"https://s30.postimg.org/e9sil8ss1/stone1.png\" alt=\"\"><span> - The stones are immpasable terrain, no robots can pass over it, they act like a fence if you use them right!</span></li>\r\n   \t\t\t\t<li><img src=\"https://s24.postimg.org/axcfxhexx/grass1.png\" alt=\"\"><span> - Food for the green robots. The red robots can't pass over it</span></li>\r\n   \t\t\t</ol>\r\n   \t\t</div>  \t\r\n   \t</section>\r\n\r\n   \t<!-- Tools panel -->\r\n      <section id=\"tools\">\r\n         <div>\r\n         \t<img id=\"herbivore\" src=\"https://s24.postimg.org/zf6feccvp/prey.png\" alt=\"\" draggable=\"true\">\r\n         </div>\r\n         <div>\r\n         \t<img id=\"carnivore\" src=\"http://www.clker.com/cliparts/Y/W/s/K/X/C/red-robot-md.png\" alt=\"\" draggable=\"true\">\r\n         </div>\r\n         <div>\r\n         \t<img id=\"stone\" src=\"https://s30.postimg.org/e9sil8ss1/stone1.png\" alt=\"\" draggable=\"true\">\r\n         </div>\r\n         <div>\r\n         \t<img id=\"grass\" src=\"https://s24.postimg.org/axcfxhexx/grass1.png\" alt=\"\" draggable=\"true\">\r\n         </div>\r\n      </section>\r\n\r\n      <!-- All the grid elements will be inserted here by JS code -->\r\n      <section id=\"gameMap\">\r\n      </section>\r\n   </div>\r\n</body>\r\n\r\n</html>\r\n"
 
 /***/ }),
 /* 4 */
@@ -378,7 +386,7 @@ exports = module.exports = __webpack_require__(6)();
 
 
 // module
-exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nsection {\n  width: 300px;\n  height: 300px;\n  border: 1px solid brown;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start;\n  margin: auto; }\n\ndiv {\n  flex: auto 0 0;\n  border: 1px solid black; }\n\n.herbivore {\n  background-color: darkgreen; }\n\n.carnivore {\n  background-color: red; }\n\n.stone {\n  background-color: #222; }\n\n.grass {\n  background-color: lightgreen; }\n\n.empty {\n  background-color: grey; }\n", ""]);
+exports.push([module.i, "#tools {\n  width: 60px;\n  height: 600px;\n  background-color: rgba(0, 0, 0, 0.4);\n  display: flex;\n  flex-flow: column nowrap;\n  border-right: 6px ridge darkgreen; }\n  #tools div {\n    width: 100%;\n    flex: 1 0 auto;\n    display: flex;\n    align-items: center;\n    justify-content: center; }\n    #tools div img {\n      width: 100%;\n      height: 100%;\n      cursor: -webkit-grab; }\n\n#gameMap {\n  width: 640px;\n  height: 600px;\n  display: flex;\n  flex-flow: row wrap;\n  align-content: flex-start;\n  cursor: crosshair; }\n\ndiv {\n  flex: auto 0 0;\n  backface-visibility: hidden; }\n\n.herbivore {\n  background-image: url(\"https://s24.postimg.org/zf6feccvp/prey.png\");\n  background-size: cover; }\n\n.carnivore {\n  background-image: url(\"http://www.clker.com/cliparts/Y/W/s/K/X/C/red-robot-md.png\");\n  background-size: cover; }\n\n.stone {\n  background-image: url(\"https://s30.postimg.org/e9sil8ss1/stone1.png\");\n  background-size: cover; }\n\n.grass {\n  background-image: url(\"https://s24.postimg.org/axcfxhexx/grass1.png\");\n  background-size: cover; }\n\n.empty {\n  background-color: transparent; }\n\n#startGamePanel {\n  position: absolute;\n  width: 100%;\n  height: 100%;\n  background-color: #222;\n  z-index: 1000;\n  display: flex;\n  flex-flow: column nowrap;\n  align-items: center; }\n  #startGamePanel h1, #startGamePanel #instructions h1 {\n    color: #42c2f4;\n    font-family: arial;\n    font-size: 3rem;\n    padding: 3rem; }\n  #startGamePanel button, #startGamePanel #instructions button {\n    font-size: 2rem;\n    margin-top: 10rem;\n    padding: 1rem;\n    border-radius: 0.5rem;\n    background-color: #429bf4;\n    cursor: pointer; }\n  #startGamePanel button:nth-of-type(2), #startGamePanel #instructions button:nth-of-type(2) {\n    margin-top: 5rem; }\n  #startGamePanel button:active, #startGamePanel #instructions button:active, #startGamePanel button:focus, #startGamePanel #instructions button:focus {\n    outline: none; }\n  #startGamePanel #instructions {\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: none;\n    background-color: #222;\n    z-index: 1005;\n    padding: 0.5rem;\n    color: white; }\n    #startGamePanel #instructions button {\n      position: absolute;\n      top: 0;\n      margin: 0;\n      right: 0;\n      color: black;\n      font-weight: bold;\n      border-radius: 0;\n      font-size: 0.7rem;\n      padding: 0.6rem; }\n    #startGamePanel #instructions h1 {\n      text-align: center; }\n    #startGamePanel #instructions p {\n      text-indent: 1rem;\n      font-size: 1.1rem; }\n    #startGamePanel #instructions ol {\n      display: flex;\n      flex-flow: row wrap;\n      margin-top: 2rem;\n      list-style-type: none; }\n      #startGamePanel #instructions ol li {\n        display: flex;\n        align-items: center;\n        margin: 1rem 0; }\n        #startGamePanel #instructions ol li img {\n          height: 50px; }\n\n* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box; }\n\nbody {\n  width: 100vw;\n  height: 100vh;\n  background-color: #42c2f4; }\n\n#wrapper {\n  width: 700px;\n  display: flex;\n  margin: auto;\n  position: relative;\n  top: 30px;\n  background-image: url(\"http://read.pudn.com/downloads106/sourcecode/others/435495/SuperTractor/res/BackGround__.jpg\"); }\n", ""]);
 
 // exports
 
@@ -714,13 +722,17 @@ var _gridElement = __webpack_require__(1);
 
 var _gridElement2 = _interopRequireDefault(_gridElement);
 
+var _dragAndDrop = __webpack_require__(13);
+
+var _dragAndDrop2 = _interopRequireDefault(_dragAndDrop);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 __webpack_require__(3);
 
 
 //	Initialize the grid and populate it
-var grid = new _grid2.default(10, 10);
+var grid = new _grid2.default(20, 20);
 grid.populate();
 
 // Transform every grid.array string in a gridElement instance
@@ -728,37 +740,141 @@ grid.array = grid.array.map(function (current, index) {
 	return new _gridElement2.default(current, index, grid);
 });
 
-//first stage output
+//Attach every grid element to the DOM and apply the classes necessary for each type of grid element
 grid.output();
 
-// Run world
-setInterval(function () {
+// Add onclick delete event on every grid element. Every time the user clicks on one gridElement, that element will become an empty space
+document.querySelectorAll('#gameMap div').forEach(function (current, index) {
+	current.addEventListener("click", scopePreserver(index));
+});
+// save the index for referencing to the grid.array element
+function scopePreserver(index) {
+	return function () {
+		grid.array[index].type = " ";
+		grid.output();
+	};
+}
 
-	grid.array.filter(function (current) {
-		return current.type === "o" || current.type === "x";
-	}).forEach(function (current1) {
-		current1.act("move");
-	});
-	grid.output();
+function animateWorld() {
+	var reproduceCounter = 0;
 
-	setTimeout(function () {
+	setInterval(function () {
+
+		// Move all animated elements if they got empty space around them
 		grid.array.filter(function (current) {
-			return current.type === "x";
+			return current.type === "o" || current.type === "x";
 		}).forEach(function (current1) {
-			current1.act("eatMeat");
+			current1.act("move");
 		});
 		grid.output();
-	}, 800);
 
-	setTimeout(function () {
-		grid.array.filter(function (current) {
-			return current.type === "o";
-		}).forEach(function (current1) {
-			current1.act("eatGrass");
-		}), 800;
+		// If they got the chance, the carnivores will eat surrounding herbivores
+		setTimeout(function () {
+			grid.array.filter(function (current) {
+				return current.type === "x";
+			}).forEach(function (current1) {
+				current1.act("eatMeat");
+			});
+			grid.output();
+
+			// If they got the chance, the herbivores will eat surrounding grass. Enable reproducing() every 5 turns
+			setTimeout(function () {
+				grid.array.filter(function (current) {
+					return current.type === "o";
+				}).forEach(function (current1) {
+					current1.act("eatGrass");
+					if (reproduceCounter === 5) {
+						current1.act("reproduce");
+					}
+				});
+			}, 1000);
+			grid.output();
+		}, 500);
+		if (reproduceCounter === 5) {
+			reproduceCounter = 0;
+		}
+		reproduceCounter++;
+	}, 1500);
+}
+
+// Let the user place additional elements on the map via drag & drop events
+(0, _dragAndDrop2.default)(grid);
+
+// On start game button press, fade out the startGamePanel and animate the world
+document.querySelector('#startGamePanel button:first-of-type').onclick = startGame;
+function startGame() {
+	document.querySelector('#startGamePanel').style.display = "none";
+	animateWorld();
+}
+
+// Display instructions on button press
+document.querySelector('#startGamePanel button ~ button').onclick = showInstructions;
+function showInstructions() {
+	document.querySelector('#startGamePanel #instructions').style.display = "block";
+}
+
+// Hide instructions on button press
+document.querySelector('#startGamePanel #instructions button').onclick = hideInstructions;
+function hideInstructions() {
+	document.querySelector('#startGamePanel #instructions').style.display = "none";
+}
+
+/***/ }),
+/* 9 */,
+/* 10 */,
+/* 11 */,
+/* 12 */,
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.default = dragAndDrop;
+function dragAndDrop(grid) {
+
+	//	load data on drag start
+	document.querySelectorAll('#tools div img').forEach(function (current) {
+		current.addEventListener("dragstart", onDragStart);
 	});
-	grid.output();
-}, 2000);
+	function onDragStart() {
+		event.dataTransfer.setData("text", event.target.id);
+	}
+
+	// allow drop event on all grid elements
+	// on drop, modify the type of the target grid element to match the one from each of the droppable images on #tools section
+	document.querySelectorAll('#gameMap div').forEach(function (current) {
+		current.addEventListener("drop", onDrop);
+		current.addEventListener("dragover", allowDrop);
+	});
+
+	function onDrop() {
+		var data = event.dataTransfer.getData("text");
+		var arrayElement = grid.array[this.index];
+		switch (data) {
+			case "herbivore":
+				arrayElement.type = "o";
+				break;
+			case "carnivore":
+				arrayElement.type = "x";
+				break;
+			case "stone":
+				arrayElement.type = "@";
+				break;
+			case "grass":
+				arrayElement.type = "|";
+				break;
+		};
+		grid.output();
+	}
+
+	function allowDrop() {
+		event.preventDefault();
+	}
+}
 
 /***/ })
 /******/ ]);
